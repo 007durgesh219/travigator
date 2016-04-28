@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import android.util.Log;
 
-import com.frodo.travigator.activities.HomeActivity;
+import com.frodo.travigator.fragments.HomeFragment;
 import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.db.DbHelper;
 
@@ -82,7 +82,7 @@ public class JSONParser extends AsyncTask<String,Void,String> {
 
     @Override
     protected String doInBackground(String... arg0) {
-	try{
+	/*try{
 
 		URL url = new URL(link);
                 HttpClient client = new DefaultHttpClient();
@@ -110,7 +110,7 @@ public class JSONParser extends AsyncTask<String,Void,String> {
 		if (flag == 0) {
 			for (int i = 0; i<jArray.length(); i++) {
 				obj = jArray.getJSONObject(i);
-				HomeActivity.cityList.add(capitalize(obj.getString("name")));
+				HomeFragment.cityList.add(capitalize(obj.getString("name")));
 			}
 
 			return "Cities loaded!";
@@ -119,14 +119,14 @@ public class JSONParser extends AsyncTask<String,Void,String> {
 			for (int i = 0; i<jArray.length(); i++) {
 				obj = jArray.getJSONObject(i);
 				String temp = obj.getString("route");
-				HomeActivity.routeNoList.add(temp);
+				HomeFragment.routeNoList.add(temp);
 			}
 			return "Routes loaded!";
 		}
 		else if (flag == 2) {
 			for (int i = 0; i<jArray.length(); i++) {
 				obj = jArray.getJSONObject(i);
-				HomeActivity.stopList.add(obj.getString("stop_name"));
+				HomeFragment.stopList.add(obj.getString("stop_name"));
 			}
 
 			return "Stops loaded!";
@@ -148,8 +148,8 @@ public class JSONParser extends AsyncTask<String,Void,String> {
 			return "Route loaded!";
 		}
 		else if (flag == 13) {
-			DbHelper db = new DbHelper(context, HomeActivity.City, HomeActivity.Route);
-			Log.v("FRODO",HomeActivity.Route);
+			DbHelper db = new DbHelper(context, HomeFragment.City, HomeFragment.Route);
+			Log.v("FRODO", HomeFragment.Route);
 			stopList = new ArrayList<String>();
 			latList = new ArrayList<String>();
 			lonList = new ArrayList<String>();
@@ -170,8 +170,8 @@ public class JSONParser extends AsyncTask<String,Void,String> {
         catch(Exception e){
 		Log.e("FRODO","ERROR",e);
             return new String("Exception: " + e.getMessage());
-	}
-            
+	}*/
+            return null;
     }
 
     @Override
@@ -190,20 +190,20 @@ Log.e("FRODO",result);
 		Toast.makeText(context,result,Toast.LENGTH_SHORT).show();
 	}
 
-	if (flag == 0) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,HomeActivity.cityList);
+	/*if (flag == 0) {
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item, HomeFragment.cityList);
 	        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	HomeActivity.citySpinner.setAdapter(adapter);
+        	HomeFragment.citySpinner.setAdapter(adapter);
 	}
 	else if (flag == 1) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,HomeActivity.routeNoList);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item, HomeFragment.routeNoList);
 	        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	HomeActivity.routeSpinner.setAdapter(adapter);
+        	HomeFragment.routeSpinner.setAdapter(adapter);
 	}
 	else if (flag == 2) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item,HomeActivity.stopList);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.simple_spinner_item, HomeFragment.stopList);
 	        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	HomeActivity.stopSpinner.setAdapter(adapter);
+        	HomeFragment.stopSpinner.setAdapter(adapter);
 	}
 	else if (flag == 10) {
 		Intent i = new Intent(context, MainActivity.class);
@@ -216,6 +216,6 @@ Log.e("FRODO",result);
 		context.startActivity(i);
 	}
 	else if (flag == 13) {
-	}
+	}*/
     }
 }

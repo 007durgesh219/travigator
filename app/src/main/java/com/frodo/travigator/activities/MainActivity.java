@@ -35,6 +35,7 @@ import com.frodo.travigator.Favorite;
 import com.frodo.travigator.JSONParser;
 import com.frodo.travigator.adapter.MyAdapter;
 import com.frodo.travigator.R;
+import com.frodo.travigator.fragments.HomeFragment;
 
 public class MainActivity extends Activity
 	implements LocationListener, GpsStatus.Listener, OnInitListener
@@ -179,7 +180,7 @@ catch (Exception e) {}
 		stopList = JSONParser.stopList;
 		latList = JSONParser.latList;
 		lonList = JSONParser.lonList;
-		deboardPos = HomeActivity.deboardPos;
+		//jc deboardPos = HomeFragment.deboardPos;
 	}
 	else if ( par.equals("Favorite") ) {
 		stopList = new ArrayList<String>(Favorite.stopList.subList(1,Favorite.stopList.size()));

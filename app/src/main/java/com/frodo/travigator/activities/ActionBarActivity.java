@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import com.frodo.travigator.JSONParser;
 import com.frodo.travigator.R;
 import com.frodo.travigator.adapter.TabsPagerAdapter;
+import com.frodo.travigator.fragments.HomeFragment;
 
 public class ActionBarActivity extends FragmentActivity implements
         ActionBar.TabListener {
@@ -23,15 +24,15 @@ public class ActionBarActivity extends FragmentActivity implements
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     // Tab titles
-    private String[] tabs = { "Favorites", "Search" };
+    private String[] tabs = {"Favorites", "Search"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    //    setContentView(R.layout.actionbaractivity);
+        //    setContentView(R.layout.actionbaractivity);
 
         // Initilization
-    //    viewPager = (ViewPager) findViewById(R.id.pager);
+        //    viewPager = (ViewPager) findViewById(R.id.pager);
 
         viewPager = new ViewPager(this);
         viewPager.setId(R.id.pager);
@@ -83,10 +84,13 @@ public class ActionBarActivity extends FragmentActivity implements
         // show respected fragment view
         viewPager.setCurrentItem(tab.getPosition());
         if (tab.getPosition() == 1) {
-            HomeActivity.cityList.clear();
-            HomeActivity.cityList.trimToSize();
-            HomeActivity.cityList.add(getString(R.string.selectCity));
-            new JSONParser(HomeActivity.server_add+"get_cities",this,0).execute();
+            HomeFragment homeFragment = (HomeFragment)getSupportFragmentManager()
+                    .findFragmentByTag("android:switcher:"+viewPager.getId()+":"+tab.getPosition());
+            homeFragment.init();
+        /*jc    HomeFragment.cityList.clear();
+            HomeFragment.cityList.trimToSize();
+            HomeFragment.cityList.add(getString(R.string.selectCity));
+            new JSONParser(HomeFragment.server_add + "get_cities", this, 0).execute();*/
         }
     }
 

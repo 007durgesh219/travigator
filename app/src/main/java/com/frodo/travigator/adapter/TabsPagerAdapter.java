@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.frodo.travigator.Favorite;
-import com.frodo.travigator.activities.HomeActivity;
+import com.frodo.travigator.fragments.HomeFragment;
 
 /**
  * Created by Kapil on 9/6/2015.
@@ -30,7 +30,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
                 return new Favorite();
             case 1:
                 // Games fragment activity
-                return new HomeActivity();
+                return new HomeFragment();
 
         }
 

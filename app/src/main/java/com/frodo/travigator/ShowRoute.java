@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import com.frodo.travigator.activities.HomeActivity;
+import com.frodo.travigator.fragments.HomeFragment;
 
 public class ShowRoute extends Activity
 {
@@ -45,7 +45,7 @@ public class ShowRoute extends Activity
 			routeData.add(temp);
 		}
 
-		dir.setText(HomeActivity.Route + " (" + HomeActivity.City + ")" );
+		// jc dir.setText(HomeFragment.Route + " (" + HomeFragment.City + ")" );
 	}
 	else if (par.equals("Favorite")) {
 		routeData = new ArrayList<String>();
