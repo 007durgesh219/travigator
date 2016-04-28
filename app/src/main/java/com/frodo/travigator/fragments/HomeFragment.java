@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.frodo.travigator.JSONParser;
+import com.frodo.travigator.utils.JSONParser;
 import com.frodo.travigator.R;
 import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.activities.NavigateActivity;

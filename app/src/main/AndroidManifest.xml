@@ -24,7 +24,7 @@
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light">
         <activity
-            android:name=".Startup"
+            android:name=".activities.Startup"
             android:label="@string/app_name"
             android:noHistory="true"
             android:screenOrientation="portrait"

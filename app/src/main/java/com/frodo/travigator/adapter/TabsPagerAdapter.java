@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.frodo.travigator.Favorite;
+import com.frodo.travigator.fragments.Favorite;
 import com.frodo.travigator.fragments.HomeFragment;
 
 /**

@@ -31,11 +31,10 @@ import java.util.Locale;
 
 import android.util.Log;
 
-import com.frodo.travigator.Favorite;
-import com.frodo.travigator.JSONParser;
+import com.frodo.travigator.fragments.Favorite;
+import com.frodo.travigator.utils.JSONParser;
 import com.frodo.travigator.adapter.MyAdapter;
 import com.frodo.travigator.R;
-import com.frodo.travigator.fragments.HomeFragment;
 
 public class MainActivity extends Activity
 	implements LocationListener, GpsStatus.Listener, OnInitListener

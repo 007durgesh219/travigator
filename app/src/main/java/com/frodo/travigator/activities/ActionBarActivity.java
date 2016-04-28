@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
 
-import com.frodo.travigator.JSONParser;
 import com.frodo.travigator.R;
 import com.frodo.travigator.adapter.TabsPagerAdapter;
 import com.frodo.travigator.fragments.HomeFragment;

@@ -1,4 +1,4 @@
-package com.frodo.travigator;
+package com.frodo.travigator.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import android.util.Log;
 
+import com.frodo.travigator.R;
 import com.frodo.travigator.fragments.HomeFragment;
 import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.db.DbHelper;

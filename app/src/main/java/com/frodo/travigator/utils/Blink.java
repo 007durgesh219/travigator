@@ -1,8 +1,10 @@
-package com.frodo.travigator;
+package com.frodo.travigator.utils;
 
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.widget.ImageView;
+
+import com.frodo.travigator.R;
 
 /**
  * Created by Kapil on 9/6/2015.

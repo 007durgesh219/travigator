@@ -1,4 +1,4 @@
-package com.frodo.travigator;
+package com.frodo.travigator.fragments;
 
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.frodo.travigator.R;
 import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.activities.ShowRoute;
 import com.frodo.travigator.app.trApp;

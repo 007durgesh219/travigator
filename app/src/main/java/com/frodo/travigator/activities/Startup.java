@@ -1,4 +1,4 @@
-package com.frodo.travigator;
+package com.frodo.travigator.activities;
 
 import android.content.Intent;
 import android.os.Handler;
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+
+import com.frodo.travigator.R;
 
 
 public class Startup extends ActionBarActivity {
