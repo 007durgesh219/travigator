@@ -5,44 +5,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:padding="10dp">
 
     <TextView
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="19sp"
-	android:text="@string/chooseNet"
-	android:layout_marginTop="10sp"	/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10sp"
+        android:text="@string/chooseNet"
+        android:textSize="19sp" />
 
     <TextView
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="35px"
-	android:text="@string/selectCity" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectCity"
+        android:textSize="35px" />
 
     <Spinner
-	android:id="@+id/citySpinner"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:spinnerMode="dropdown" />
+        android:id="@+id/citySpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
     <TextView
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="35px"
-	android:text="@string/selectRoute" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectRoute"
+        android:textSize="35px" />
 
     <Spinner
-	android:id="@+id/routeNoSpinner"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:spinnerMode="dropdown" />
+        android:id="@+id/routeNoSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:textSize="35px"
-		android:text="@string/selectSrcStop"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectSrcStop"
+        android:textSize="35px" />
 
     <Spinner
         android:id="@+id/srcStopSpinner"
@@ -51,48 +51,49 @@
         android:spinnerMode="dropdown"></Spinner>
 
     <TextView
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="35px"
-	android:text="@string/selectStop" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectStop"
+        android:textSize="35px" />
 
     <Spinner
-	android:id="@+id/stopSpinner"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:spinnerMode="dropdown" />
+        android:id="@+id/stopSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal"
-	    android:layout_marginTop="10dp" 
-	    android:layout_gravity="center_horizontal">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
 
-	    <Button
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/button_navigate"
-		android:id="@+id/searchNavigate" />
+        <Button
+            android:id="@+id/searchNavigate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_navigate" />
 
-	    <Button
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/button_view"
-		android:id="@+id/searchViewRoute" />
+        <Button
+            android:id="@+id/searchViewRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_view"
+            android:visibility="gone" />
 
-	    <Button
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/button_refresh"
-		android:id="@+id/searchRefresh" />
-	
-	</LinearLayout>
+        <Button
+            android:id="@+id/searchRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_refresh" />
+
+    </LinearLayout>
 
 </LinearLayout>
 

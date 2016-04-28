@@ -116,7 +116,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        Button viewRoute = (Button) rootView.findViewById(R.id.searchViewRoute);
+        /*Button viewRoute = (Button) rootView.findViewById(R.id.searchViewRoute);
         viewRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,7 +128,7 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
 
         Button refresh = (Button) rootView.findViewById(R.id.searchRefresh);
         refresh.setOnClickListener(new View.OnClickListener() {

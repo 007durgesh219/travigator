@@ -1,4 +1,4 @@
-package com.frodo.travigator;
+package com.frodo.travigator.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import com.frodo.travigator.Favorite;
+import com.frodo.travigator.JSONParser;
+import com.frodo.travigator.R;
 import com.frodo.travigator.fragments.HomeFragment;
 
 public class ShowRoute extends Activity
@@ -35,7 +38,7 @@ public class ShowRoute extends Activity
 	else if (par.equals("Home")) {
 		routeData = new ArrayList<String> ();
 		
-		for (int i=0; i<JSONParser.stopList.size(); i++) {
+		for (int i = 0; i< JSONParser.stopList.size(); i++) {
 			String temp = String.valueOf(i+1)+". ";
 			temp += JSONParser.stopList.get(i)+" (";
 			temp += JSONParser.latList.get(i)+",";
@@ -50,7 +53,7 @@ public class ShowRoute extends Activity
 	else if (par.equals("Favorite")) {
 		routeData = new ArrayList<String>();
 
-		for (int i=1; i<Favorite.stopList.size(); i++) {
+		for (int i = 1; i< Favorite.stopList.size(); i++) {
 			String temp = String.valueOf(i)+". ";
 			temp += Favorite.stopList.get(i)+" (";
 			temp += Favorite.latList.get(i-1)+",";
