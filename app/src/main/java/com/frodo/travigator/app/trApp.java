@@ -2,6 +2,7 @@ package com.frodo.travigator.app;
 
 import android.app.Application;
 import android.content.Context;
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -14,6 +15,7 @@ public class trApp extends Application {
     private static Context mContext;
 	private static RequestQueue mRequestQueue;
 	private static LocationUtil mLocationUtil;
+    private static TextToSpeech tts;
 
 	@Override
 	public void onCreate() {
@@ -50,4 +52,16 @@ public class trApp extends Application {
 		}
 		return mLocationUtil;
 	}
+
+    public static TextToSpeech getTTS() {
+        if (tts == null) {
+            tts = new TextToSpeech(getAppContext(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+
+                }
+            });
+        }
+        return tts;
+    }
 }

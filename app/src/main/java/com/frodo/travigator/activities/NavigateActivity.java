@@ -3,26 +3,50 @@ package com.frodo.travigator.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.widget.ListView;
 
 import com.frodo.travigator.R;
+import com.frodo.travigator.adapter.StopListAdapter;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.events.LocationChangedEvent;
+import com.frodo.travigator.models.Stop;
+import com.frodo.travigator.utils.CommonUtils;
 import com.frodo.travigator.utils.LocationUtil;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class NavigateActivity extends Activity {
-
     public static final String STOPS = "stops";
     public static final String SRC_STOP = "src_stop";
     public static final String DST_STOP = "dst_stop";
+
+    private static int ERROR_RADIUS = 50;
+
+    private ListView stopsList ;
+    private Stop[] stops;
+    private int srcPos, dstPos;
+    private boolean isFirstTimeAdjusted = false;
+    private int infoGivenPos = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigate);
+        stopsList = (ListView)findViewById(R.id.stop_list);
+        stops = (Stop[]) getIntent().getSerializableExtra(STOPS);
+        if (stops == null) {
+            finish();
+        }
+        srcPos = getIntent().getIntExtra(SRC_STOP, -1);
+        dstPos = getIntent().getIntExtra(DST_STOP, -1);
+
+        stopsList.setAdapter(new StopListAdapter(this, stops));
+
         if (LocationUtil.checkLocationPermission() && LocationUtil.isGPSOn()) {
             trApp.getLocationUtil().startLocationUpdates();
         } else if (!LocationUtil.checkLocationPermission()){
@@ -30,6 +54,7 @@ public class NavigateActivity extends Activity {
         } else {
             trApp.getLocationUtil().checkLocationSettings(this);
         }
+        CommonUtils.toast("Getting your location. Please wait...");
     }
 
     @Override
@@ -64,8 +89,49 @@ public class NavigateActivity extends Activity {
         }
     }
 
+    private int getStopPos(LatLng latLng) {
+        for (int i = 0 ; i < stops.length ; i++) {
+            Stop stop = stops[i];
+            float[] result = new float[2];
+            Location.distanceBetween(latLng.latitude, latLng.longitude, stop.getStop_lat(), stop.getStop_lon(), result);
+            if (result[0] < ERROR_RADIUS)
+                return i;
+        }
+        return -1;
+    }
+
+    private int getNearstStop(LatLng latLng) {
+        int res = 0;
+        float distance = Float.MAX_VALUE;
+        for (int i = 0 ; i < stops.length ; i++) {
+            Stop stop = stops[i];
+            float[] result = new float[2];
+            Location.distanceBetween(latLng.latitude, latLng.longitude, stop.getStop_lat(), stop.getStop_lon(), result);
+            if (distance > result[0]){
+                distance = result[0];
+                res = i;
+            }
+        }
+        return res;
+    }
+
     @Subscribe
     public void onLocationChangedEvent(LocationChangedEvent event) {
-
+        LatLng latLng = event.getLocation();
+        int pos = getStopPos(latLng);
+        if (pos == -1 && !isFirstTimeAdjusted){
+            isFirstTimeAdjusted = true;
+            stopsList.smoothScrollToPosition(getNearstStop(latLng));
+        } else {
+            stopsList.smoothScrollToPosition(pos);
+            if (infoGivenPos != -1 && infoGivenPos != pos) {
+                String message = "You are arrived at " + stops[pos].getStop_name()+".";
+                if (dstPos == pos) {
+                    message = "This is our final stop.";
+                }
+                trApp.getTTS().speak(message, TextToSpeech.QUEUE_FLUSH, null);
+                infoGivenPos = pos;
+            }
+        }
     }
 }

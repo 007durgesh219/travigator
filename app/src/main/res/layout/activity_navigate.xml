@@ -8,5 +8,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.frodo.travigator.activities.NavigateActivity">
-
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/stop_list"></ListView>
 </RelativeLayout>

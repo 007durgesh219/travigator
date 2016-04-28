@@ -30,16 +30,16 @@ public class Stop implements Serializable {
         this.stop_name = stop_name;
     }
 
-    public String getStop_lat() {
-        return stop_lat;
+    public double getStop_lat() {
+        return Double.valueOf(stop_lat);
     }
 
     public void setStop_lat(String stop_lat) {
         this.stop_lat = stop_lat;
     }
 
-    public String getStop_lon() {
-        return stop_lon;
+    public double getStop_lon() {
+        return Double.valueOf(stop_lon);
     }
 
     public void setStop_lon(String stop_lon) {
