@@ -1,9 +1,11 @@
 package com.frodo.travigator.models;
 
+import java.io.Serializable;
+
 /**
  * Created by durgesh on 4/29/16.
  */
-public class Stop {
+public class Stop implements Serializable {
     public String getStop_id() {
         return stop_id;
     }

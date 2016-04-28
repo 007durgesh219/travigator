@@ -33,7 +33,7 @@
     <string name="button_speechOff">Turn Off Speech</string>
     <string name="button_speechOn">Turn On Speech</string>
     <string name="button_speakAgain">Speak Again!</string>
-    
+
     <string name="loc_unav">Location Unavailable! Please turn on Location Services</string>
     <string name="loc_av">Your current location is: </string>
     <string name="loc_acc">Your location is accurate to: </string>

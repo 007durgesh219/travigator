@@ -7,11 +7,13 @@ import android.text.TextUtils;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.frodo.travigator.utils.LocationUtil;
 
 public class trApp extends Application {
     private static final Object TAG = Application.class.getSimpleName();
     private static Context mContext;
 	private static RequestQueue mRequestQueue;
+	private static LocationUtil mLocationUtil;
 
 	@Override
 	public void onCreate() {
@@ -40,5 +42,12 @@ public class trApp extends Application {
 	public static  <T> void addToRequestQueue(Request<T> req) {
 		req.setTag(TAG);
 		getRequestQueue().add(req);
+	}
+
+	public static LocationUtil getLocationUtil() {
+		if (mLocationUtil == null) {
+			mLocationUtil = new LocationUtil(getAppContext());
+		}
+		return mLocationUtil;
 	}
 }

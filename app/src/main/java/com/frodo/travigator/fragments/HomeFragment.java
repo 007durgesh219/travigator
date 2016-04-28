@@ -3,6 +3,7 @@ package com.frodo.travigator.fragments;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.frodo.travigator.JSONParser;
 import com.frodo.travigator.R;
 import com.frodo.travigator.activities.MainActivity;
+import com.frodo.travigator.activities.NavigateActivity;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.db.DbHelper;
 import com.frodo.travigator.models.Stop;
@@ -44,6 +46,7 @@ public class HomeFragment extends Fragment {
     public String Route = "", City = "";
     public Stop[] stops;
     public int deboardPos = -1;
+    public int srcPos = -1;
     private ProgressDialog mProgressDialog;
 
     private EditText ip;
@@ -91,6 +94,7 @@ public class HomeFragment extends Fragment {
         stopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         stopSpinner.setAdapter(stopAdapter);
         stopSpinner.setOnItemSelectedListener(stopListener);
+        srcStopSpinner.setOnItemSelectedListener(srcStopListener);
 
 
         Button navigate = (Button) rootView.findViewById(R.id.searchNavigate);
@@ -103,7 +107,8 @@ public class HomeFragment extends Fragment {
                     CommonUtils.toast(getString(R.string.selectRoute));
                 } else {
                     if (isFavorite(Route)) {
-                        new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
+                        loadStops(true);
+                        //new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
                     } else {
                         favAlert();
                     }
@@ -266,33 +271,7 @@ public class HomeFragment extends Fragment {
                 stopSpinner.setEnabled(true);
                 srcStopSpinner.setEnabled(true);
                 Route = routeNoList.get(pos);
-                JsonArrayRequest objRequest = new JsonArrayRequest(Constants.SERVER_ROOT + "get_stops/" + CommonUtils.deCapitalize(City) + "?route=" + Route,
-                        new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray jArray) {
-                        if (getActivity() == null)
-                            return;
-                        mProgressDialog.dismiss();
-                        stops = new Gson().fromJson(jArray.toString(), new Stop[]{}.getClass());
-                        if (stops == null) {
-                            CommonUtils.toast("Unable to parse server response");
-                            return;
-                        }
-                        for (int i = 0 ; i < stops.length ; i++) {
-                            stopList.add(stops[i].getStop_name());
-                        }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (getActivity() == null)
-                            return;
-                        mProgressDialog.dismiss();
-                        CommonUtils.toast(error.toString());
-                    }
-                });
-                trApp.getRequestQueue().add(objRequest);
-                showProgressDialog("Loading...", getContext().getString(R.string.loadingStop));
+                loadStops(false);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
                 ArrayAdapter<String> srcAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, stopList);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -326,6 +305,18 @@ public class HomeFragment extends Fragment {
             stopSpinner.setAdapter(adapter);
         }
     };
+
+    private OnItemSelectedListener srcStopListener = new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            srcPos = position-1;
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            srcPos = -1;
+        }
+    } ;
 
     private OnItemSelectedListener stopListener = new OnItemSelectedListener() {
 
@@ -387,14 +378,16 @@ public class HomeFragment extends Fragment {
         alertDialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 addFav();
-                new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
+                loadStops(true);
+                //new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
             }
         });
 
         alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
+                loadStops(true);
+                //new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
             }
         });
 
@@ -434,5 +427,46 @@ public class HomeFragment extends Fragment {
         });
         trApp.getRequestQueue().add(objReq);
         showProgressDialog("Loading...", getContext().getString(R.string.loadingCity));
+    }
+
+    private void loadStops(final boolean isNavigate ) {
+        JsonArrayRequest objRequest = new JsonArrayRequest(Constants.SERVER_ROOT + "get_stops/" + CommonUtils.deCapitalize(City) + "?route=" + Route,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray jArray) {
+                        if (getActivity() == null)
+                            return;
+                        mProgressDialog.dismiss();
+                        stops = new Gson().fromJson(jArray.toString(), new Stop[]{}.getClass());
+                        if (stops == null) {
+                            CommonUtils.toast("Unable to parse server response");
+                            return;
+                        }
+                        for (int i = 0 ; i < stops.length ; i++) {
+                            stopList.add(stops[i].getStop_name());
+                        }
+                        if (isNavigate) {
+                            if (stops == null) {
+                                CommonUtils.toast("Please select route you want to navigate");
+                                return;
+                            }
+                            Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);
+                            navitaionActivity.putExtra(NavigateActivity.STOPS, stops);
+                            navitaionActivity.putExtra(NavigateActivity.SRC_STOP, srcPos);
+                            navitaionActivity.putExtra(NavigateActivity.DST_STOP, deboardPos);
+                            startActivity(navitaionActivity);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (getActivity() == null)
+                    return;
+                mProgressDialog.dismiss();
+                CommonUtils.toast(error.toString());
+            }
+        });
+        trApp.getRequestQueue().add(objRequest);
+        showProgressDialog("Loading...", getContext().getString(R.string.loadingStop));
     }
 }
