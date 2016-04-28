@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 
 import com.frodo.travigator.R;
@@ -33,6 +35,8 @@ public class NavigateActivity extends Activity {
     private boolean isFirstTimeAdjusted = false;
     private int infoGivenPos = -1;
 
+    private boolean enableSpeech = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +59,14 @@ public class NavigateActivity extends Activity {
             trApp.getLocationUtil().checkLocationSettings(this);
         }
         CommonUtils.toast("Getting your location. Please wait...");
+
+        CheckBox checkBox = (CheckBox)findViewById(R.id.enable_speech_cb);
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                enableSpeech = isChecked;
+            }
+        });
     }
 
     @Override
@@ -129,7 +141,8 @@ public class NavigateActivity extends Activity {
                 if (dstPos == pos) {
                     message = "This is our final stop.";
                 }
-                trApp.getTTS().speak(message, TextToSpeech.QUEUE_FLUSH, null);
+                if (enableSpeech)
+                    trApp.getTTS().speak(message, TextToSpeech.QUEUE_FLUSH, null);
                 infoGivenPos = pos;
             }
         }
