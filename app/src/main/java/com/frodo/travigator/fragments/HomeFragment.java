@@ -2,46 +2,47 @@ package com.frodo.travigator.fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.database.Cursor;
-import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.frodo.travigator.activities.MainActivity;
-import com.frodo.travigator.db.DbHelper;
 import com.frodo.travigator.JSONParser;
 import com.frodo.travigator.R;
+import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.app.trApp;
+import com.frodo.travigator.db.DbHelper;
+import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
 import com.frodo.travigator.utils.Constants;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
     public ArrayList<String> cityList, routeNoList, stopList;
     public Spinner citySpinner, routeSpinner, stopSpinner, srcStopSpinner;
     public String Route = "", City = "";
+    public Stop[] stops;
     public int deboardPos = -1;
     private ProgressDialog mProgressDialog;
 
@@ -97,12 +98,11 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (City == "") {
-                    Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
+                    CommonUtils.toast(getString(R.string.selectCity));
                 } else if (Route == "") {
-                    Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
+                    CommonUtils.toast(getString(R.string.selectRoute));
                 } else {
                     if (isFavorite(Route)) {
-
                         new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
                     } else {
                         favAlert();
@@ -273,13 +273,13 @@ public class HomeFragment extends Fragment {
                         if (getActivity() == null)
                             return;
                         mProgressDialog.dismiss();
-                        try {
-                            for (int i = 0; i<jArray.length(); i++) {
-                                JSONObject obj = jArray.getJSONObject(i);
-                                stopList.add(obj.getString("stop_name"));
-                            }
-                        }catch (Exception ex) {
+                        stops = new Gson().fromJson(jArray.toString(), new Stop[]{}.getClass());
+                        if (stops == null) {
                             CommonUtils.toast("Unable to parse server response");
+                            return;
+                        }
+                        for (int i = 0 ; i < stops.length ; i++) {
+                            stopList.add(stops[i].getStop_name());
                         }
                     }
                 }, new Response.ErrorListener() {
