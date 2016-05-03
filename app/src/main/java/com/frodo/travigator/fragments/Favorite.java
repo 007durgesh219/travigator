@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.frodo.travigator.R;
 import com.frodo.travigator.activities.MainActivity;
+import com.frodo.travigator.activities.NavigateActivity;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.db.DbHelper;
 import com.frodo.travigator.models.Stop;
@@ -112,10 +113,15 @@ public class Favorite extends Fragment {
                 } else if (Route == "") {
                     Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
                 } else {
-                    Intent i = new Intent(getActivity(), MainActivity.class);
-                    i.putExtra(getString(R.string.parentKey), "Favorite");
-                    startActivity(i);
-                    getActivity().finish();
+                    if (stops == null) {
+                        CommonUtils.toast("Please select route you want to navigate");
+                        return;
+                    }
+                    Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);
+                    navitaionActivity.putExtra(NavigateActivity.STOPS, stops);
+                    navitaionActivity.putExtra(NavigateActivity.SRC_STOP, srcPos);
+                    navitaionActivity.putExtra(NavigateActivity.DST_STOP, destPos);
+                    startActivity(navitaionActivity);
                 }
             }
 
