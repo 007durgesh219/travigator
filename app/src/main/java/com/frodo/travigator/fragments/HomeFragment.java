@@ -39,8 +39,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
+    private static final String CITY_LIST = "city_list";
+    private static final String ROUTE_LIST = "route_list";
+    private static final String STOPS_LIST = "stops_list";
+
     public ArrayList<String> cityList, routeNoList, stopList;
     public Spinner citySpinner, routeSpinner, stopSpinner, srcStopSpinner;
     public String Route = "", City = "";
@@ -59,7 +64,10 @@ public class HomeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.home, container, false);
 
         if (savedInstanceState != null) {
-            cityList = savedInstanceState.getStringArrayList("cityList");
+            cityList = savedInstanceState.getStringArrayList(CITY_LIST);
+            routeNoList = savedInstanceState.getStringArrayList(ROUTE_LIST);
+            stops = (Stop[])savedInstanceState.getSerializable(STOPS_LIST);
+            stopList = (ArrayList)CommonUtils.getStringArray(stops);
         } else {
             cityList = new ArrayList<String>();
             routeNoList = new ArrayList<String>();
@@ -183,7 +191,9 @@ public class HomeFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putStringArrayList("cityList", cityList);
+        outState.putStringArrayList(CITY_LIST, cityList);
+        outState.putStringArrayList(ROUTE_LIST, routeNoList);
+        outState.putSerializable(STOPS_LIST, stops);
     }
 
     private OnItemSelectedListener cityListener = new OnItemSelectedListener() {
@@ -333,13 +343,15 @@ public class HomeFragment extends Fragment {
 
 
     public void addFav() {
-        if (Route != "") {
-            new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 13).execute();
-        } else if (City == "") {
-            Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
+        if (City == "") {
+            CommonUtils.toast(getString(R.string.selectCity));
+        } else if (Route == ""){
+            CommonUtils.toast(getString(R.string.selectRoute));
         }
+
+        DbHelper db = new DbHelper(getContext(),City, "route_"+CommonUtils.deCapitalize(Route));
+        db.setTable(stops);
+        db.closeDB();
     }
 
     private boolean isFavorite(String route) {

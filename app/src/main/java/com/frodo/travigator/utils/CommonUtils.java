@@ -4,6 +4,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.frodo.travigator.app.trApp;
+import com.frodo.travigator.models.Stop;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by durgesh on 4/28/16.
@@ -45,5 +49,13 @@ public class CommonUtils {
         text = text.toLowerCase();
         text = text.replace(' ', '_');
         return text;
+    }
+
+    public static List<String> getStringArray(Stop[] stops) {
+        List<String> stopList = new ArrayList<>();
+        for (Stop stop : stops) {
+            stopList.add(stop.getStop_name());
+        }
+        return stopList;
     }
 }

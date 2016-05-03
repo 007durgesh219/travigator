@@ -19,341 +19,334 @@ import android.widget.Toast;
 
 import com.frodo.travigator.R;
 import com.frodo.travigator.activities.MainActivity;
-import com.frodo.travigator.activities.ShowRoute;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.db.DbHelper;
+import com.frodo.travigator.models.Stop;
+import com.frodo.travigator.utils.CommonUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class Favorite extends Fragment
-{
+public class Favorite extends Fragment {
+    private static final String CITY_LIST = "city_list", ROUTE_LIST="route_list", STOPS_LIST="stops_list";
     private ArrayList<String> cityList, routeList;
-    public static ArrayList<String> stopList, latList, lonList;
-    public static String City="", Route="";
-    public static int deboardPos = -1;
+    public ArrayList<String> stopList;
+    public String City = "", Route = "";
 
-    private Spinner citySpinner, routeSpinner, stopSpinner;
+    private int destPos, srcPos;
+    private Stop[] stops;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+    private Spinner citySpinner, routeSpinner, stopSpinner, srcStopSpinner;
 
-		setHasOptionsMenu(true);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-		View rootView = inflater.inflate(R.layout.favorite, container, false);
-		if (savedInstanceState != null) {
-			cityList = savedInstanceState.getStringArrayList("cityList");
-			routeList = savedInstanceState.getStringArrayList("routeList");
-			stopList = savedInstanceState.getStringArrayList("stopList");
-			latList = savedInstanceState.getStringArrayList("latList");
-			lonList = savedInstanceState.getStringArrayList("lonList");
-		}
-		else {
-			stopList = new ArrayList<String>();
-			routeList = new ArrayList<String>();
-			cityList = new ArrayList<String>();
-			latList = new ArrayList<String>();
-			lonList = new ArrayList<String>();
+        setHasOptionsMenu(true);
 
-			stopList.add(getString(R.string.routeFirst));
-			routeList.add(getString(R.string.cityFirst));
-			cityList.add(getString(R.string.selectCity));
+        View rootView = inflater.inflate(R.layout.favorite, container, false);
+        if (savedInstanceState != null) {
+            cityList = savedInstanceState.getStringArrayList(CITY_LIST);
+            routeList = savedInstanceState.getStringArrayList(ROUTE_LIST);
+            stops = (Stop[])savedInstanceState.getSerializable(STOPS_LIST);
+            stopList = (ArrayList<String>) CommonUtils.getStringArray(stops);
+            stopList = savedInstanceState.getStringArrayList("stopList");
+        } else {
+            stopList = new ArrayList<String>();
+            routeList = new ArrayList<String>();
+            cityList = new ArrayList<String>();
 
-			File dir = new File(DbHelper.DATABASE_PATH);
-			File files[] = dir.listFiles();
-			int l=0;
-			if (files != null) l=files.length;
+            stopList.add(getString(R.string.routeFirst));
+            routeList.add(getString(R.string.cityFirst));
+            cityList.add(getString(R.string.selectCity));
 
-			for ( int i = 0; i<l; i++) {
-				String name = files[i].getName();
-				name.replaceAll("_"," ");
-				if(name.contains("journal")==false) {
-					cityList.add(name);
-				}
-			}
-		}
+            File dir = new File(DbHelper.DATABASE_PATH);
+            File files[] = dir.listFiles();
+            int l = 0;
+            if (files != null) l = files.length;
 
-		citySpinner = (Spinner) rootView.findViewById(R.id.cityFav);
-		routeSpinner = (Spinner) rootView.findViewById(R.id.routeFav);
-		stopSpinner = (Spinner) rootView.findViewById(R.id.stopFav);
+            for (int i = 0; i < l; i++) {
+                String name = files[i].getName();
+                name = CommonUtils.capitalize(name);
+                if (name.contains("journal") == false) {
+                    cityList.add(name);
+                }
+            }
+        }
 
-		ArrayAdapter<String> cityAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,cityList);
-		cityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		citySpinner.setAdapter(cityAdapter);
-		citySpinner.setOnItemSelectedListener(cityListener);
+        citySpinner = (Spinner) rootView.findViewById(R.id.cityFav);
+        routeSpinner = (Spinner) rootView.findViewById(R.id.routeFav);
+        stopSpinner = (Spinner) rootView.findViewById(R.id.stopFav);
+        srcStopSpinner = (Spinner) rootView.findViewById(R.id.srcStopFav);
 
-		if (cityList.size() == 2) {
-			citySpinner.setSelection(1);
-		}
+        ArrayAdapter<String> cityAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, cityList);
+        cityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        citySpinner.setAdapter(cityAdapter);
+        citySpinner.setOnItemSelectedListener(cityListener);
 
-		ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,routeList);
-		routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		routeSpinner.setAdapter(routeAdapter);
-		routeSpinner.setOnItemSelectedListener(routeListener);
+        if (cityList.size() == 2) {
+            citySpinner.setSelection(1);
+        }
 
-		ArrayAdapter<String> stopAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,stopList);
-		stopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		stopSpinner.setAdapter(stopAdapter);
-		stopSpinner.setOnItemSelectedListener(stopListener);
+        ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, routeList);
+        routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        routeSpinner.setAdapter(routeAdapter);
+        routeSpinner.setOnItemSelectedListener(routeListener);
 
-		Button navigate = (Button) rootView.findViewById(R.id.buttonNavigate);
-		navigate.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if ( City == "" ) {
-					Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
-				}
-				else if ( Route == "" ) {
-					Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
-				}
-				else {
-						Intent i = new Intent(getActivity(), MainActivity.class);
-						i.putExtra(getString(R.string.parentKey), "Favorite");
-						startActivity(i);
-						getActivity().finish();
-					}
-				}
+        ArrayAdapter<String> stopAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+        stopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> srcStopAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+        srcStopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopSpinner.setAdapter(stopAdapter);
+        stopSpinner.setOnItemSelectedListener(stopListener);
+        srcStopSpinner.setAdapter(srcStopAdapter);
+        srcStopSpinner.setOnItemSelectedListener(srcStopListener);
 
-		});
+        Button navigate = (Button) rootView.findViewById(R.id.buttonNavigate);
+        navigate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (City == "") {
+                    Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
+                } else if (Route == "") {
+                    Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent i = new Intent(getActivity(), MainActivity.class);
+                    i.putExtra(getString(R.string.parentKey), "Favorite");
+                    startActivity(i);
+                    getActivity().finish();
+                }
+            }
 
-		Button viewRoute = (Button) rootView.findViewById(R.id.buttonViewRoute);
-		viewRoute.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if ( Route != "" ) {
-					Intent i = new Intent(getActivity(), ShowRoute.class);
-					i.putExtra(getString(R.string.parentKey), "Favorite");
-					startActivity(i);
-					getActivity().finish();
+        });
 
-			}
-			else if ( City == "" ) {
-				Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
-			}
-			else {
-				Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
-			}
-			}
-		});
+        /*Button viewRoute = (Button) rootView.findViewById(R.id.buttonViewRoute);
+        viewRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Route != "") {
+                    Intent i = new Intent(getActivity(), ShowRoute.class);
+                    i.putExtra(getString(R.string.parentKey), "Favorite");
+                    startActivity(i);
+                    getActivity().finish();
 
-		Button remFav = (Button) rootView.findViewById(R.id.buttonRemFav);
-		remFav.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (Route != "") {
-					DbHelper db = new DbHelper(getActivity(), City, Route);
-					db.delTable();
-					db.closeDB();
-					citySpinner.setSelection(0);
-				} else if (City == "") {
-					Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+                } else if (City == "") {
+                    Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });*/
 
-		return rootView;
-	}
+        Button remFav = (Button) rootView.findViewById(R.id.buttonRemFav);
+        remFav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Route != "") {
+                    DbHelper db = new DbHelper(getActivity(), City, "route_"+CommonUtils.deCapitalize(Route));
+                    db.delTable();
+                    db.closeDB();
+                    citySpinner.setSelection(0);
+                } else if (City == "") {
+                    Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        return rootView;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// setContentView(R.layout.favorite);
+        super.onCreate(savedInstanceState);
+        // setContentView(R.layout.favorite);
 
-	}
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// Inflate the menu items for use in the action bar
-		//MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.main_activity_actions, menu);
-		super.onCreateOptionsMenu(menu, inflater);
-	}
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
-		switch (item.getItemId()) {
-			case R.id.action_settings:
-				MainActivity.openSettings(getContext());
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
-   
-    protected void openSettings() {}
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu items for use in the action bar
+        //MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_actions, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                MainActivity.openSettings(getContext());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outstate) {
-	super.onSaveInstanceState(outstate);
-	
-	outstate.putStringArrayList("cityList",cityList);
-	outstate.putStringArrayList("routeList",routeList);
-	outstate.putStringArrayList("stopList",stopList);
-	outstate.putStringArrayList("latList",latList);
-	outstate.putStringArrayList("lonList",lonList);
+        super.onSaveInstanceState(outstate);
+
+        outstate.putStringArrayList("cityList", cityList);
+        outstate.putStringArrayList("routeList", routeList);
+        outstate.putStringArrayList("stopList", stopList);
     }
 
     private OnItemSelectedListener cityListener = new OnItemSelectedListener() {
 
-	@Override
-	public void onItemSelected ( AdapterView<?> parent, View view, int pos, long id) { 
-		routeList.clear();
-		routeList.trimToSize();
-	
-		if ( pos == 0 ) {
-			routeList.add(getString(R.string.cityFirst));
-			City = "";
-			routeSpinner.setEnabled(false);
-		}
-	
-		else {
-			routeList.add(getString(R.string.selectRoute));
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            routeList.clear();
+            routeList.trimToSize();
 
-			City = cityList.get(pos);
+            if (pos == 0) {
+                routeList.add(getString(R.string.cityFirst));
+                City = "";
+                routeSpinner.setEnabled(false);
+            } else {
+                routeList.add(getString(R.string.selectRoute));
 
-			DbHelper db = new DbHelper(trApp.getAppContext(),City);
-			Cursor c = db.getTables();
+                City = CommonUtils.deCapitalize(cityList.get(pos));
 
-			if (c != null && c.getCount()>0) {
-				c.moveToFirst();
-				while (!c.isAfterLast()) {
-					String temp = c.getString(0);
+                DbHelper db = new DbHelper(trApp.getAppContext(), City);
+                Cursor c = db.getTables();
 
-					if (temp.contains("Route")) {
-						String temp2 = temp.substring(6).replaceAll("_"," ");
-						routeList.add(temp2);
-					}
-					c.moveToNext();
-				}
-			}
-			db.closeDB();
+                if (c != null && c.getCount() > 0) {
+                    c.moveToFirst();
+                    while (!c.isAfterLast()) {
+                        String temp = c.getString(0);
+                        if (!temp.contains("route_")) {
+                            c.moveToNext();
+                            continue;
+                        }
+                        routeList.add(CommonUtils.capitalize(temp.replace("route_","")));
+                        c.moveToNext();
+                    }
+                }
+                db.closeDB();
 
-			routeSpinner.setEnabled(true);
-		}
-	
-		Collections.sort(routeList.subList(1,routeList.size()));
-/*
-	        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("GPS is disabled!");
-  	        alertDialog.setMessage("Please enable GPS to use this app!");
-  
+                routeSpinner.setEnabled(true);
+            }
 
-	        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-        	    public void onClick(DialogInterface dialog,int which) {
-                	Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	                startActivity(intent);
-        	    }
-	        });
-  
-         	alertDialog.show();
-*/
+            Collections.sort(routeList.subList(1, routeList.size()));
 
-		ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,routeList);
-        	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	       	routeSpinner.setAdapter(routeAdapter);
+            ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, routeList);
+            routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            routeSpinner.setAdapter(routeAdapter);
 
-	}
+        }
 
-	@Override
-	public void onNothingSelected ( AdapterView<?> parent ) {
-		routeList.clear();
-		routeList.trimToSize();
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            routeList.clear();
+            routeList.trimToSize();
 
-		routeList.add(getString(R.string.cityFirst));
+            routeList.add(getString(R.string.cityFirst));
 
-		City = "";
+            City = "";
 
-		routeSpinner.setEnabled(false);
-		ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,routeList);
-        	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	       	routeSpinner.setAdapter(routeAdapter);
+            routeSpinner.setEnabled(false);
+            ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, routeList);
+            routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            routeSpinner.setAdapter(routeAdapter);
 
-	}
+        }
     };
 
     private OnItemSelectedListener routeListener = new OnItemSelectedListener() {
 
-	@Override
-	public void onItemSelected ( AdapterView<?> parent, View view, int pos, long id) {
-		stopList.clear();
-		stopList.trimToSize();
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            stopList.clear();
+            stopList.trimToSize();
 
-		latList.clear();
-		latList.trimToSize();
-		
-		lonList.clear();
-		lonList.trimToSize();
+            Route = "";
 
-		Route = "";
+            if (pos != 0) {
+                Route = routeList.get(pos).trim();
+                stopList.add(getString(R.string.selectStop));
 
-		if ( pos != 0 ) {
-			Route = "Route_" + routeList.get(pos).trim().replaceAll(" ","_");
-			stopList.add(getString(R.string.selectStop));
+                DbHelper db = new DbHelper(trApp.getAppContext(), City, "route_"+CommonUtils.deCapitalize(Route));
+                Cursor c = db.showTable();
 
-			DbHelper db = new DbHelper(trApp.getAppContext(), City, Route);
-			Cursor c = db.showTable();
-		
-			if ( c != null && c.getCount() > 0 ) {
-				c.moveToFirst();
-				while( !c.isAfterLast() ) {
-					stopList.add(c.getString(1));
-					latList.add(c.getString(2));
-					lonList.add(c.getString(3));
-					c.moveToNext();
-				}
-			}
-			db.closeDB();
-			stopSpinner.setEnabled(true);
-		}
-		else {
-			stopList.add(getString(R.string.routeFirst));
-			stopSpinner.setEnabled(false);
-		}
+                stops = new Stop[c.getCount()];
+                if (c != null && c.getCount() > 0) {
+                    c.moveToFirst();
+                    int i = 0;
+                    while (!c.isAfterLast()) {
+                        stops[i] = new Stop(c.getString(1), String.valueOf(c.getInt(0)),
+                                c.getString(2), c.getString(3));
+                        i++;
+                        c.moveToNext();
+                    }
+                    stopList = (ArrayList)CommonUtils.getStringArray(stops);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,stopList);
-	        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	stopSpinner.setAdapter(adapter);
-	}
+                }
+                db.closeDB();
+                stopSpinner.setEnabled(true);
+                srcStopSpinner.setEnabled(true);
+            } else {
+                stopList.add(getString(R.string.routeFirst));
+                stopSpinner.setEnabled(false);
+                srcStopSpinner.setEnabled(false);
+            }
 
-	@Override
-	public void onNothingSelected ( AdapterView<?> parent ) {
-		Route = "";
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            stopSpinner.setAdapter(adapter);
+            ArrayAdapter<String> srcAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+            srcAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            srcStopSpinner.setAdapter(srcAdapter);
+        }
 
-		stopList.clear();
-		stopList.trimToSize();
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            Route = "";
 
-		latList.clear();
-		latList.trimToSize();
-		
-		lonList.clear();
-		lonList.trimToSize();
-		stopList.add(getString(R.string.routeFirst));
+            stopList.clear();
+            stopList.trimToSize();
 
-		stopSpinner.setEnabled(false);
+            stopList.add(getString(R.string.routeFirst));
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,stopList);
-	        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	stopSpinner.setAdapter(adapter);
-	}
+            stopSpinner.setEnabled(false);
+            srcStopSpinner.setEnabled(false);
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            stopSpinner.setAdapter(adapter);
+            ArrayAdapter<String> srcAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+            srcAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            srcStopSpinner.setAdapter(srcAdapter);
+        }
+    };
+
+    private OnItemSelectedListener srcStopListener = new OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            srcPos = position-1;
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            srcPos = -1;
+        }
     };
 
     private OnItemSelectedListener stopListener = new OnItemSelectedListener() {
 
-	@Override
-	public void onItemSelected ( AdapterView<?> parent, View view, int pos, long id) {
-		deboardPos = pos-1;
-	}
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            destPos = pos - 1;
+        }
 
-	@Override
-	public void onNothingSelected ( AdapterView<?> parent ) {
-		deboardPos = -1;
-	}
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            destPos = -1;
+        }
     };
-
-
 
 
 }

@@ -182,10 +182,10 @@ catch (Exception e) {}
 		//jc deboardPos = HomeFragment.deboardPos;
 	}
 	else if ( par.equals("Favorite") ) {
-		stopList = new ArrayList<String>(Favorite.stopList.subList(1,Favorite.stopList.size()));
+		/*stopList = new ArrayList<String>(Favorite.stopList.subList(1,Favorite.stopList.size()));
 		latList = Favorite.latList;
 		lonList = Favorite.lonList;
-		deboardPos = Favorite.deboardPos;
+		deboardPos = Favorite.deboardPos;*/
 	}
 	else {
 		stopList = new ArrayList<String>();

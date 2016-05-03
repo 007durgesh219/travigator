@@ -3,79 +3,92 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:padding="10dp">
 
     <TextView
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="19sp"
-	android:text="@string/chooseFav" />
-
-    <TextView 
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="17sp"
-	android:text="@string/selectCity" />
-
-    <Spinner
-	android:id="@+id/cityFav"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:spinnerMode="dropdown" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/chooseFav"
+        android:textSize="19sp" />
 
     <TextView
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:textSize="17sp"
-	android:text="@string/selectRoute" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectCity"
+        android:textSize="17sp" />
 
     <Spinner
-	android:id="@+id/routeFav"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:spinnerMode="dropdown" />
+        android:id="@+id/cityFav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:textSize="17sp"
-		android:text="@string/selectStop"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectRoute"
+        android:textSize="17sp" />
+
     <Spinner
-	android:id="@+id/stopFav"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:spinnerMode="dropdown" />
+        android:id="@+id/routeFav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectStop"
+        android:textSize="17sp" />
 
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal"
-	    android:layout_marginTop="10dp" 
-	    android:layout_gravity="center_horizontal">
+    <Spinner
+        android:id="@+id/srcStopFav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
-	    <Button
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/button_navigate"
-		android:id="@+id/buttonNavigate" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectStop"
+        android:textSize="17sp" />
 
-	    <Button
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/button_view"
-		android:id="@+id/buttonViewRoute" />
+    <Spinner
+        android:id="@+id/stopFav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
 
-		<Button
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/button_remFav"
-			android:id="@+id/buttonRemFav" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
-	</LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonNavigate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_navigate" />
+
+        <Button
+            android:id="@+id/buttonViewRoute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_view" />
+
+        <Button
+            android:id="@+id/buttonRemFav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_remFav" />
+
+    </LinearLayout>
 
 </LinearLayout>

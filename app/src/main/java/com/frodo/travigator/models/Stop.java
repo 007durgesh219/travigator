@@ -6,6 +6,13 @@ import java.io.Serializable;
  * Created by durgesh on 4/29/16.
  */
 public class Stop implements Serializable {
+    public Stop(){}
+    public Stop(String name, String pos, String lat, String lon) {
+        this.stop_name = name;
+        this.stop_lat = lat;
+        this.stop_lon = lon;
+        this.stop_pos = pos;
+    }
     public String getStop_id() {
         return stop_id;
     }
