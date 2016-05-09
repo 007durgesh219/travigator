@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.frodo.travigator.events.LocationChangedEvent;
 import com.frodo.travigator.utils.JSONParser;
 import com.frodo.travigator.R;
 import com.frodo.travigator.activities.MainActivity;
@@ -33,8 +35,11 @@ import com.frodo.travigator.db.DbHelper;
 import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
 import com.frodo.travigator.utils.Constants;
+import com.frodo.travigator.utils.LocationUtil;
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -273,9 +278,6 @@ public class HomeFragment extends Fragment {
             stopList.clear();
             stopList.trimToSize();
 
-
-            final int pos1 = pos;
-
             if (pos != 0) {
                 stopList.add(getString(R.string.selectStop));
                 stopSpinner.setEnabled(true);
@@ -457,6 +459,14 @@ public class HomeFragment extends Fragment {
                         for (int i = 0 ; i < stops.length ; i++) {
                             stopList.add(stops[i].getStop_name());
                         }
+                        if (LocationUtil.checkLocationPermission() && LocationUtil.isGPSOn()) {
+                            trApp.getLocationUtil().startLocationUpdates();
+                        } else if (!LocationUtil.checkLocationPermission()){
+                            trApp.getLocationUtil().askLocationPermission(getActivity());
+                        } else {
+                            trApp.getLocationUtil().checkLocationSettings(getActivity());
+                        }
+                        CommonUtils.toast("Getting your location. Please wait...");
                         if (isNavigate) {
                             if (stops == null) {
                                 CommonUtils.toast("Please select route you want to navigate");
@@ -480,5 +490,32 @@ public class HomeFragment extends Fragment {
         });
         trApp.getRequestQueue().add(objRequest);
         showProgressDialog("Loading...", getContext().getString(R.string.loadingStop));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onLocationChangedEvent(LocationChangedEvent event) {
+        if (stops == null || stops.length <= 0) {
+            return;
+        }
+        if (srcStopSpinner.getSelectedItemPosition() > 0)
+            return;
+        int pos = CommonUtils.getStopPos(stops, event.getLocation());
+        srcStopSpinner.setSelection(pos+1);
+        if (pos == -1) {
+            CommonUtils.toast("You are not near any bus stop on this route");
+            trApp.getTTS().speak("You are not near any bus stop on this route.", TextToSpeech.QUEUE_FLUSH, null);
+        }
     }
 }

@@ -7,6 +7,8 @@ package com.frodo.travigator.activities;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -14,7 +16,9 @@ import android.support.v4.view.ViewPager;
 
 import com.frodo.travigator.R;
 import com.frodo.travigator.adapter.TabsPagerAdapter;
+import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.fragments.HomeFragment;
+import com.frodo.travigator.utils.LocationUtil;
 
 public class ActionBarActivity extends FragmentActivity implements
         ActionBar.TabListener {
@@ -97,4 +101,22 @@ public class ActionBarActivity extends FragmentActivity implements
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
 
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case LocationUtil.REQ_PERMISSIONS_REQUEST_ACCESS_FILE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    trApp.getLocationUtil().checkLocationSettings(this);
+                }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case LocationUtil.REQUEST_CHECK_SETTINGS:
+                trApp.getLocationUtil().dialogClosed();
+        }
+    }
 }

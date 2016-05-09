@@ -1,10 +1,12 @@
 package com.frodo.travigator.utils;
 
+import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.models.Stop;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,5 +59,31 @@ public class CommonUtils {
             stopList.add(stop.getStop_name());
         }
         return stopList;
+    }
+
+    public static int getStopPos(Stop[] stops, LatLng latLng) {
+        int pos = CommonUtils.getNearstStop(stops, latLng);
+        Stop stop = stops[pos];
+        float[] result = new float[2];
+        Location.distanceBetween(latLng.latitude, latLng.longitude, stop.getStop_lat(), stop.getStop_lon(), result);
+        if (result[0] < Constants.ERROR_RADIUS)
+            return pos;
+        return -1;
+    }
+
+    public static int getNearstStop(Stop[] stops, LatLng latLng) {
+        int res = 0;
+        float distance = Float.MAX_VALUE;
+        for (int i = 0 ; i < stops.length ; i++) {
+            Stop stop = stops[i];
+            float[] result = new float[2];
+            Location.distanceBetween(latLng.latitude, latLng.longitude, stop.getStop_lat(), stop.getStop_lon(), result);
+            if (distance > result[0]){
+                distance = result[0];
+                res = i;
+            }
+            //CommonUtils.log("Distance:"+i+":"+result[0]+"Pos:"+res);
+        }
+        return res;
     }
 }

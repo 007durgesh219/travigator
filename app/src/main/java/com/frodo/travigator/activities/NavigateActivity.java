@@ -14,9 +14,12 @@ import com.frodo.travigator.R;
 import com.frodo.travigator.adapter.StopListAdapter;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.events.LocationChangedEvent;
+import com.frodo.travigator.events.MocLocationChangedEvent;
 import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
+import com.frodo.travigator.utils.Constants;
 import com.frodo.travigator.utils.LocationUtil;
+import com.frodo.travigator.utils.MocLocSimulator;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.greenrobot.eventbus.EventBus;
@@ -26,8 +29,6 @@ public class NavigateActivity extends Activity {
     public static final String STOPS = "stops";
     public static final String SRC_STOP = "src_stop";
     public static final String DST_STOP = "dst_stop";
-
-    private static int ERROR_RADIUS = 50;
 
     private ListView stopsList ;
     private Stop[] stops;
@@ -73,6 +74,7 @@ public class NavigateActivity extends Activity {
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
+        new MocLocSimulator(srcPos, dstPos).simulate(stops, 5000);
     }
 
     @Override
@@ -101,50 +103,32 @@ public class NavigateActivity extends Activity {
         }
     }
 
-    private int getStopPos(LatLng latLng) {
-        for (int i = 0 ; i < stops.length ; i++) {
-            Stop stop = stops[i];
-            float[] result = new float[2];
-            Location.distanceBetween(latLng.latitude, latLng.longitude, stop.getStop_lat(), stop.getStop_lon(), result);
-            if (result[0] < ERROR_RADIUS)
-                return i;
-        }
-        return -1;
-    }
-
-    private int getNearstStop(LatLng latLng) {
-        int res = 0;
-        float distance = Float.MAX_VALUE;
-        for (int i = 0 ; i < stops.length ; i++) {
-            Stop stop = stops[i];
-            float[] result = new float[2];
-            Location.distanceBetween(latLng.latitude, latLng.longitude, stop.getStop_lat(), stop.getStop_lon(), result);
-            if (distance > result[0]){
-                distance = result[0];
-                res = i;
-            }
-        }
-        return res;
-    }
-
     @Subscribe
     public void onLocationChangedEvent(LocationChangedEvent event) {
         LatLng latLng = event.getLocation();
-        int pos = getStopPos(latLng);
+        int pos = CommonUtils.getStopPos(stops, latLng);
+        CommonUtils.log("Pos:"+pos);
         if (pos == -1 && !isFirstTimeAdjusted){
             isFirstTimeAdjusted = true;
-            stopsList.smoothScrollToPosition(getNearstStop(latLng));
+            stopsList.smoothScrollToPosition(CommonUtils.getNearstStop(stops, latLng));
         } else {
             stopsList.smoothScrollToPosition(pos);
             if (infoGivenPos != -1 && infoGivenPos != pos) {
-                String message = "You are arrived at " + stops[pos].getStop_name()+".";
+                String message = "You arrived at " + stops[pos].getStop_name()+".";
                 if (dstPos == pos) {
-                    message = "This is our final stop.";
+                    message = message+". This is you final stop.";
                 }
-                if (enableSpeech)
+                if (enableSpeech) {
                     trApp.getTTS().speak(message, TextToSpeech.QUEUE_FLUSH, null);
-                infoGivenPos = pos;
+                }
             }
+            infoGivenPos = pos;
         }
+    }
+
+    @Subscribe
+    public void onMocLocationChangedEvent(MocLocationChangedEvent event) {
+        CommonUtils.log("Event: "+event.getLocation().toString());
+        EventBus.getDefault().post(new LocationChangedEvent(event.getLocation()));
     }
 }

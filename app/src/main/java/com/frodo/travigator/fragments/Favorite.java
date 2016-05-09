@@ -332,7 +332,7 @@ public class Favorite extends Fragment {
     private OnItemSelectedListener srcStopListener = new OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            srcPos = position-1;
+            srcPos = position;
         }
 
         @Override
@@ -345,7 +345,7 @@ public class Favorite extends Fragment {
 
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-            destPos = pos - 1;
+            destPos = pos;
         }
 
         @Override
