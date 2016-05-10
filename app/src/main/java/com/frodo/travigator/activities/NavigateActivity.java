@@ -1,20 +1,32 @@
 package com.frodo.travigator.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 
 import com.frodo.travigator.R;
 import com.frodo.travigator.adapter.StopListAdapter;
+import com.frodo.travigator.adapter.TabsPagerAdapter;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.events.LocationChangedEvent;
 import com.frodo.travigator.events.MocLocationChangedEvent;
+import com.frodo.travigator.fragments.Favorite;
+import com.frodo.travigator.fragments.HomeFragment;
+import com.frodo.travigator.fragments.MapNavigationFragment;
+import com.frodo.travigator.fragments.TextNavigationFragment;
 import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
 import com.frodo.travigator.utils.Constants;
@@ -26,52 +38,60 @@ import com.google.android.gms.maps.model.LatLng;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class NavigateActivity extends Activity {
+public class NavigateActivity extends FragmentActivity implements ActionBar.TabListener {
     public static final String STOPS = "stops";
     public static final String SRC_STOP = "src_stop";
     public static final String DST_STOP = "dst_stop";
 
-    private ListView stopsList ;
-    private Stop[] stops;
-    private int srcPos, dstPos;
-    private boolean isFirstTimeAdjusted = false;
-    private int infoGivenPos = -1;
+    private ViewPager viewPager;
+    private NavigateActivity.TabsPagerAdapter mAdapter;
+    private ActionBar actionBar;
+
+    // Tab titles
+    private String[] tabs = {"Text", "Map"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navigate);
-        stopsList = (ListView)findViewById(R.id.stop_list);
-        stops = (Stop[]) getIntent().getSerializableExtra(STOPS);
-        if (stops == null) {
-            finish();
+        viewPager = new ViewPager(this);
+        viewPager.setId(R.id.pager);
+
+        setContentView(viewPager);
+
+        actionBar = getActionBar();
+        mAdapter = new NavigateActivity.TabsPagerAdapter(getSupportFragmentManager());
+
+        viewPager.setAdapter(mAdapter);
+        actionBar.setHomeButtonEnabled(false);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        // Adding Tabs
+        for (String tab_name : tabs) {
+            actionBar.addTab(actionBar.newTab().setText(tab_name)
+                    .setTabListener(this));
         }
-        srcPos = getIntent().getIntExtra(SRC_STOP, -1);
-        dstPos = getIntent().getIntExtra(DST_STOP, -1);
 
-        stopsList.setAdapter(new StopListAdapter(this, stops));
+        /**
+         * on swiping the viewpager make respective tab selected
+         * */
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-        if (LocationUtil.checkLocationPermission() && LocationUtil.isGPSOn()) {
-            trApp.getLocationUtil().startLocationUpdates();
-        } else if (!LocationUtil.checkLocationPermission()){
-            trApp.getLocationUtil().askLocationPermission(this);
-        } else {
-            trApp.getLocationUtil().checkLocationSettings(this);
-        }
-        CommonUtils.toast("Getting your location. Please wait...");
-    }
+            @Override
+            public void onPageSelected(int position) {
+                // on changing the page
+                // make respected tab selected
+                actionBar.setSelectedNavigationItem(position);
+            }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        EventBus.getDefault().register(this);
-        new MocLocSimulator(srcPos, dstPos).simulate(stops, 5000);
-    }
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
+            }
+        });
+
     }
 
     @Override
@@ -94,32 +114,46 @@ public class NavigateActivity extends Activity {
         }
     }
 
-    @Subscribe
-    public void onLocationChangedEvent(LocationChangedEvent event) {
-        LatLng latLng = event.getLocation();
-        int pos = CommonUtils.getStopPos(stops, latLng);
-        CommonUtils.log("Pos:"+pos);
-        if (pos == -1 && !isFirstTimeAdjusted){
-            isFirstTimeAdjusted = true;
-            stopsList.smoothScrollToPosition(CommonUtils.getNearstStop(stops, latLng));
-        } else {
-            stopsList.smoothScrollToPosition(pos);
-            if (infoGivenPos != -1 && infoGivenPos != pos) {
-                String message = "You arrived at " + stops[pos].getStop_name()+".";
-                if (dstPos == pos) {
-                    message = message+". This is you final stop.";
-                }
-                if (PrefManager.isTTSEnabled()) {
-                    trApp.getTTS().speak(message, TextToSpeech.QUEUE_FLUSH, null);
-                }
-            }
-            infoGivenPos = pos;
-        }
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // on tab selected
+        // show respected fragment view
+        viewPager.setCurrentItem(tab.getPosition());
     }
 
-    @Subscribe
-    public void onMocLocationChangedEvent(MocLocationChangedEvent event) {
-        CommonUtils.log("Event: "+event.getLocation().toString());
-        EventBus.getDefault().post(new LocationChangedEvent(event.getLocation()));
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+    }
+
+    private class TabsPagerAdapter extends FragmentPagerAdapter {
+
+
+
+        public TabsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int index) {
+
+            switch (index) {
+                case 0:
+                    return new TextNavigationFragment();
+                case 1:
+                    return new MapNavigationFragment();
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
     }
 }

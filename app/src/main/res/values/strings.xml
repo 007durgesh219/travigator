@@ -51,6 +51,7 @@
 
     <string name="parentKey">com.frodo.travigate.PARENT_KEY</string>
     <string name="selectSrcStop">Select Source Stop</string>
+    <string name="google_api_key">AIzaSyDWG1FdZv4f-4Fbvx8SqY15BoXRi9aiswU</string>
 
 </resources>
 
