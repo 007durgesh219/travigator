@@ -20,6 +20,7 @@ import com.frodo.travigator.utils.CommonUtils;
 import com.frodo.travigator.utils.Constants;
 import com.frodo.travigator.utils.LocationUtil;
 import com.frodo.travigator.utils.MocLocSimulator;
+import com.frodo.travigator.utils.PrefManager;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.greenrobot.eventbus.EventBus;
@@ -35,8 +36,6 @@ public class NavigateActivity extends Activity {
     private int srcPos, dstPos;
     private boolean isFirstTimeAdjusted = false;
     private int infoGivenPos = -1;
-
-    private boolean enableSpeech = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +59,6 @@ public class NavigateActivity extends Activity {
             trApp.getLocationUtil().checkLocationSettings(this);
         }
         CommonUtils.toast("Getting your location. Please wait...");
-
-        CheckBox checkBox = (CheckBox)findViewById(R.id.enable_speech_cb);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                enableSpeech = isChecked;
-            }
-        });
     }
 
     @Override
@@ -118,7 +109,7 @@ public class NavigateActivity extends Activity {
                 if (dstPos == pos) {
                     message = message+". This is you final stop.";
                 }
-                if (enableSpeech) {
+                if (PrefManager.isTTSEnabled()) {
                     trApp.getTTS().speak(message, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
