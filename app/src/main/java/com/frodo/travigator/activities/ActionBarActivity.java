@@ -90,10 +90,6 @@ public class ActionBarActivity extends FragmentActivity implements
             HomeFragment homeFragment = (HomeFragment)getSupportFragmentManager()
                     .findFragmentByTag("android:switcher:"+viewPager.getId()+":"+tab.getPosition());
             homeFragment.init();
-        /*jc    HomeFragment.cityList.clear();
-            HomeFragment.cityList.trimToSize();
-            HomeFragment.cityList.add(getString(R.string.selectCity));
-            new JSONParser(HomeFragment.server_add + "get_cities", this, 0).execute();*/
         }
     }
 

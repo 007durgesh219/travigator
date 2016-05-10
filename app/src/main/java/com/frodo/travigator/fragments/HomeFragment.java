@@ -117,27 +117,12 @@ public class HomeFragment extends Fragment {
                 } else {
                     if (isFavorite(Route)) {
                         loadStops(true);
-                        //new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
                     } else {
                         favAlert();
                     }
                 }
             }
         });
-
-        /*Button viewRoute = (Button) rootView.findViewById(R.id.searchViewRoute);
-        viewRoute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Route != "") {
-                    new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 11).execute();
-                } else if (City == "") {
-                    Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });*/
 
         Button refresh = (Button) rootView.findViewById(R.id.searchRefresh);
         refresh.setOnClickListener(new View.OnClickListener() {
@@ -389,7 +374,6 @@ public class HomeFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 addFav();
                 loadStops(true);
-                //new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
             }
         });
 
@@ -397,7 +381,6 @@ public class HomeFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 loadStops(true);
-                //new JSONParser(Constants.SERVER_ROOT + "download.php?city=" + City + "&route=" + Route, getActivity(), 10).execute();
             }
         });
 
