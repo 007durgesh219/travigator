@@ -20,18 +20,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.frodo.travigator.events.LocationChangedEvent;
-import com.frodo.travigator.utils.JSONParser;
 import com.frodo.travigator.R;
-import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.activities.NavigateActivity;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.db.DbHelper;
+import com.frodo.travigator.events.LocationChangedEvent;
 import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
 import com.frodo.travigator.utils.Constants;
@@ -44,7 +41,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class HomeFragment extends Fragment {
     private static final String CITY_LIST = "city_list";
@@ -185,7 +181,7 @@ public class HomeFragment extends Fragment {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_settings:
-                MainActivity.openSettings(getContext());
+                CommonUtils.openSettings(getContext());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

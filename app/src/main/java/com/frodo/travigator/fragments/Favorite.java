@@ -1,9 +1,9 @@
 package com.frodo.travigator.fragments;
 
-import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +18,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.frodo.travigator.R;
-import com.frodo.travigator.activities.MainActivity;
 import com.frodo.travigator.activities.NavigateActivity;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.db.DbHelper;
@@ -185,7 +184,7 @@ public class Favorite extends Fragment {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_settings:
-                MainActivity.openSettings(getContext());
+                CommonUtils.openSettings(getContext());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

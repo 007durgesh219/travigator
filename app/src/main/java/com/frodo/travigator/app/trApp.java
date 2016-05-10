@@ -9,6 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.frodo.travigator.utils.LocationUtil;
+import com.frodo.travigator.utils.PrefManager;
 
 public class trApp extends Application {
     private static final Object TAG = Application.class.getSimpleName();
@@ -21,6 +22,7 @@ public class trApp extends Application {
 	public void onCreate() {
 		super.onCreate();
 		trApp.mContext = getApplicationContext();
+		PrefManager.init(this);
 	}
 
 	public static Context getAppContext() {
