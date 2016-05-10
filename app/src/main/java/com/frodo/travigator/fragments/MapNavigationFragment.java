@@ -61,7 +61,8 @@ public class MapNavigationFragment extends Fragment {
                 for (Stop stop : stops) {
                     markers.add(mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(stop.getStop_lat(), stop.getStop_lon()))
-                            .icon(BitmapDescriptorFactory.defaultMarker())));
+                            .icon(BitmapDescriptorFactory.defaultMarker())
+                            .title(stop.getStop_name())));
                 }
             }
         }
