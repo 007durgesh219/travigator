@@ -423,55 +423,64 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadStops(final boolean isNavigate ) {
-        JsonArrayRequest objRequest = new JsonArrayRequest(Constants.SERVER_ROOT + "get_stops/" + CommonUtils.deCapitalize(City) + "?route=" + Route,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray jArray) {
-                        if (getActivity() == null)
-                            return;
-                        mProgressDialog.dismiss();
-                        stops = new Gson().fromJson(jArray.toString(), new Stop[]{}.getClass());
-                        if (stops == null) {
-                            CommonUtils.toast("Unable to parse server response");
-                            return;
-                        }
-                        for (int i = 0 ; i < stops.length ; i++) {
-                            stopList.add(stops[i].getStop_name());
-                        }
-                        if (LocationUtil.checkLocationPermission() && LocationUtil.isGPSOn()) {
-                            trApp.getLocationUtil().startLocationUpdates();
-                        } else if (!LocationUtil.checkLocationPermission()){
-                            trApp.getLocationUtil().askLocationPermission(getActivity());
-                        } else {
-                            trApp.getLocationUtil().checkLocationSettings(getActivity());
-                        }
-                        CommonUtils.toast("Getting your location. Please wait...");
-                        if (isNavigate) {
-                            if (stops == null) {
-                                CommonUtils.toast("Please select route you want to navigate");
+        if (stops == null) {
+            JsonArrayRequest objRequest = new JsonArrayRequest(Constants.SERVER_ROOT + "get_stops/" + CommonUtils.deCapitalize(City) + "?route=" + Route,
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray jArray) {
+                            if (getActivity() == null)
                                 return;
-                            } else if(srcPos == -1 || deboardPos == -1) {
-                                CommonUtils.toast("Please select source and destination");
+                            mProgressDialog.dismiss();
+                            stops = new Gson().fromJson(jArray.toString(), new Stop[]{}.getClass());
+                            if (stops == null) {
+                                CommonUtils.toast("Unable to parse server response");
                                 return;
                             }
-                            Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);
-                            navitaionActivity.putExtra(NavigateActivity.STOPS, stops);
-                            navitaionActivity.putExtra(NavigateActivity.SRC_STOP, srcPos);
-                            navitaionActivity.putExtra(NavigateActivity.DST_STOP, deboardPos);
-                            startActivity(navitaionActivity);
+                            for (int i = 0; i < stops.length; i++) {
+                                stopList.add(stops[i].getStop_name());
+                            }
+                            if (LocationUtil.checkLocationPermission() && LocationUtil.isGPSOn()) {
+                                trApp.getLocationUtil().startLocationUpdates();
+                            } else if (!LocationUtil.checkLocationPermission()) {
+                                trApp.getLocationUtil().askLocationPermission(getActivity());
+                            } else {
+                                trApp.getLocationUtil().checkLocationSettings(getActivity());
+                            }
+                            CommonUtils.toast("Getting your location. Please wait...");
+                            if (isNavigate) {
+                                if (srcPos == -1 || deboardPos == -1) {
+                                    CommonUtils.toast("Please select source and destination");
+                                    return;
+                                }
+                                Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);
+                                navitaionActivity.putExtra(NavigateActivity.STOPS, stops);
+                                navitaionActivity.putExtra(NavigateActivity.SRC_STOP, srcPos);
+                                navitaionActivity.putExtra(NavigateActivity.DST_STOP, deboardPos);
+                                startActivity(navitaionActivity);
+                            }
                         }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (getActivity() == null)
-                    return;
-                mProgressDialog.dismiss();
-                CommonUtils.toast(error.toString());
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (getActivity() == null)
+                        return;
+                    mProgressDialog.dismiss();
+                    CommonUtils.toast(error.toString());
+                }
+            });
+            trApp.getRequestQueue().add(objRequest);
+            showProgressDialog("Loading...", getContext().getString(R.string.loadingStop));
+        } else {
+            if (srcPos == -1 || deboardPos == -1) {
+                CommonUtils.toast("Please select source and destination");
+                return;
             }
-        });
-        trApp.getRequestQueue().add(objRequest);
-        showProgressDialog("Loading...", getContext().getString(R.string.loadingStop));
+            Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);
+            navitaionActivity.putExtra(NavigateActivity.STOPS, stops);
+            navitaionActivity.putExtra(NavigateActivity.SRC_STOP, srcPos);
+            navitaionActivity.putExtra(NavigateActivity.DST_STOP, deboardPos);
+            startActivity(navitaionActivity);
+        }
     }
 
     @Override
