@@ -119,6 +119,9 @@ public class Favorite extends Fragment {
                     if (stops == null) {
                         CommonUtils.toast("Please select route you want to navigate");
                         return;
+                    } else if(srcPos == -1 || destPos == -1) {
+                        CommonUtils.toast("Please select source and destination");
+                        return;
                     }
                     Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);
                     navitaionActivity.putExtra(NavigateActivity.STOPS, stops);

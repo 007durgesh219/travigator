@@ -258,6 +258,7 @@ public class HomeFragment extends Fragment {
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
             stopList.clear();
             stopList.trimToSize();
+            Route = "";
 
             if (pos != 0) {
                 stopList.add(getString(R.string.selectStop));
@@ -448,6 +449,9 @@ public class HomeFragment extends Fragment {
                         if (isNavigate) {
                             if (stops == null) {
                                 CommonUtils.toast("Please select route you want to navigate");
+                                return;
+                            } else if(srcPos == -1 || deboardPos == -1) {
+                                CommonUtils.toast("Please select source and destination");
                                 return;
                             }
                             Intent navitaionActivity = new Intent(getActivity(), NavigateActivity.class);

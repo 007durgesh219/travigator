@@ -78,12 +78,6 @@
             android:text="@string/button_navigate" />
 
         <Button
-            android:id="@+id/buttonViewRoute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_view" />
-
-        <Button
             android:id="@+id/buttonRemFav"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
