@@ -133,37 +133,6 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
-    public void locationRequestCancelled(){
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if(lastLocation != null) {
-            mCurrentLocation = new LatLng(lastLocation.getLatitude(),lastLocation.getLongitude());
-        }
-    }
-
-    public static boolean isValidLocation(Location location){
-        if(location != null){
-            if(location.getLatitude() > 0 && location.getLongitude() > 0)
-                return true;
-            return false;
-        }
-        return false;
-    }
-
-    public static boolean isValidLocation(LatLng location){
-        if (location != null){
-            if (location.latitude > 0 && location.longitude > 0)
-                return true;
-            return false;
-        }
-        return false;
-    }
-
-    public static boolean isValidLocation(Double latitude, Double longitude){
-        if (latitude > 0 && longitude > 0)
-            return true;
-        return false;
-    }
-
     /**
      * Removes location updates from the FusedLocationApi.
      */
@@ -171,6 +140,7 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks,
         // It is a good practice to remove location requests when the activity is in a paused or
         // stopped state. Doing so helps battery performance and is especially
         // recommended in applications that request frequent location updates.
+        CommonUtils.log("Stopping Location Updates");
         if(mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     mGoogleApiClient,
@@ -257,10 +227,6 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks,
                 .build();
     }
 
-    public GoogleApiClient getmGoogleApiClient(){
-        return mGoogleApiClient;
-    }
-
     @Override
     public void onConnected(Bundle bundle) {
 
@@ -301,7 +267,6 @@ public class LocationUtil implements GoogleApiClient.ConnectionCallbacks,
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         CommonUtils.logStatus(TAG, "Location updated ->"+location.getLatitude()+":"+location.getLongitude());
         EventBus.getDefault().post(new LocationChangedEvent(mCurrentLocation));
-        stopLocationUpdates();
     }
 
     @Override

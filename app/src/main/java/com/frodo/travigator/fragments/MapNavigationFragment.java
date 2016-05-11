@@ -57,7 +57,6 @@ public class MapNavigationFragment extends Fragment {
                     .findFragmentById(R.id.location_map)).getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                mMap.setMyLocationEnabled(true);
                 markers = new Marker[stops.length];
                 for (int i = 0 ; i < stops.length ; i++) {
                     Stop stop = stops[i];
