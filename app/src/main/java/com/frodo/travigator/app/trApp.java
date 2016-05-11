@@ -23,6 +23,9 @@ public class trApp extends Application {
 		super.onCreate();
 		trApp.mContext = getApplicationContext();
 		PrefManager.init(this);
+		if (PrefManager.isTTSEnabled()) {
+			getTTS();
+		}
 	}
 
 	public static Context getAppContext() {

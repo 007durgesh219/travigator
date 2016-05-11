@@ -21,8 +21,12 @@ import com.frodo.travigator.R;
 import com.frodo.travigator.activities.NavigateActivity;
 import com.frodo.travigator.app.trApp;
 import com.frodo.travigator.db.DbHelper;
+import com.frodo.travigator.events.DBChangedEvent;
 import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -125,24 +129,6 @@ public class Favorite extends Fragment {
             }
 
         });
-
-        /*Button viewRoute = (Button) rootView.findViewById(R.id.buttonViewRoute);
-        viewRoute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Route != "") {
-                    Intent i = new Intent(getActivity(), ShowRoute.class);
-                    i.putExtra(getString(R.string.parentKey), "Favorite");
-                    startActivity(i);
-                    getActivity().finish();
-
-                } else if (City == "") {
-                    Toast.makeText(getActivity(), getString(R.string.selectCity), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.selectRoute), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });*/
 
         Button remFav = (Button) rootView.findViewById(R.id.buttonRemFav);
         remFav.setOnClickListener(new View.OnClickListener() {
@@ -339,6 +325,65 @@ public class Favorite extends Fragment {
             srcPos = -1;
         }
     };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onDBChangedEvent(DBChangedEvent event) {
+        stopList = new ArrayList<String>();
+        routeList = new ArrayList<String>();
+        cityList = new ArrayList<String>();
+
+        stopList.add(getString(R.string.routeFirst));
+        routeList.add(getString(R.string.cityFirst));
+        cityList.add(getString(R.string.selectCity));
+
+        File dir = new File(DbHelper.DATABASE_PATH);
+        File files[] = dir.listFiles();
+        int l = 0;
+        if (files != null) l = files.length;
+
+        for (int i = 0; i < l; i++) {
+            String name = files[i].getName();
+            name = CommonUtils.capitalize(name);
+            if (name.contains("journal") == false) {
+                cityList.add(name);
+            }
+        }
+
+        ArrayAdapter<String> cityAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, cityList);
+        cityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        citySpinner.setAdapter(cityAdapter);
+        citySpinner.setOnItemSelectedListener(cityListener);
+
+        if (cityList.size() == 2) {
+            citySpinner.setSelection(1);
+        }
+
+        ArrayAdapter<String> routeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, routeList);
+        routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        routeSpinner.setAdapter(routeAdapter);
+        routeSpinner.setOnItemSelectedListener(routeListener);
+
+        ArrayAdapter<String> stopAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+        stopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> srcStopAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, stopList);
+        srcStopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopSpinner.setAdapter(stopAdapter);
+        stopSpinner.setOnItemSelectedListener(stopListener);
+        srcStopSpinner.setAdapter(srcStopAdapter);
+        srcStopSpinner.setOnItemSelectedListener(srcStopListener);
+    }
 
     private OnItemSelectedListener stopListener = new OnItemSelectedListener() {
 

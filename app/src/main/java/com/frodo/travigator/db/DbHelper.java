@@ -15,8 +15,11 @@ import android.util.Log;
 
 import com.frodo.travigator.R;
 import com.frodo.travigator.app.trApp;
+import com.frodo.travigator.events.DBChangedEvent;
 import com.frodo.travigator.models.Stop;
 import com.frodo.travigator.utils.CommonUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class DbHelper extends SQLiteOpenHelper {
     private Context mContext;
@@ -111,6 +114,7 @@ public class DbHelper extends SQLiteOpenHelper {
             Stop stop = stops[i];
             addStop(stop.getStop_name(), String.valueOf(stop.getStop_lat()), String.valueOf(stop.getStop_lon()));
         }
+        EventBus.getDefault().post(new DBChangedEvent());
     }
 
     public void addStop(String stopName, String lat, String lon) {

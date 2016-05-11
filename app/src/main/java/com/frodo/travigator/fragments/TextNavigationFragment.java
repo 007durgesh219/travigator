@@ -69,7 +69,7 @@ public class TextNavigationFragment extends Fragment {
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        new MocLocSimulator(srcPos, dstPos).simulate(stops, 5000);
+        //new MocLocSimulator(srcPos, dstPos).simulate(stops, 5000);
     }
 
     @Override
@@ -118,7 +118,9 @@ public class TextNavigationFragment extends Fragment {
                 }
             }
             infoGivenPos = pos;
-            if (current != pos && current != -1) {
+            if (current == -1)
+                return;
+            if (current != pos) {
                 status[current] = StopListAdapter.STATUS_VISITED;
             }
             current = pos;

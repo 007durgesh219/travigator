@@ -338,16 +338,15 @@ public class HomeFragment extends Fragment {
     }
 
     private boolean isFavorite(String route) {
-        DbHelper db = new DbHelper(trApp.getAppContext(), City);
+        DbHelper db = new DbHelper(getContext(),City);
         Cursor c = db.getTables();
 
         Boolean flag = false;
-
         if (c != null && c.getCount() > 0) {
             c.moveToFirst();
             while (!c.isAfterLast()) {
                 String temp = c.getString(0);
-                if (temp.toLowerCase().equals(route.toLowerCase())) {
+                if (temp.toLowerCase().equals("route_"+route.toLowerCase())) {
                     flag = true;
                     break;
                 }
