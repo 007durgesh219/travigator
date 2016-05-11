@@ -131,7 +131,6 @@ public class TextNavigationFragment extends Fragment {
                     }
                 });
             }
-
         }
     }
 

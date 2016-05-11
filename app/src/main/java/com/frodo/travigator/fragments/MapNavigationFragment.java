@@ -20,6 +20,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -27,17 +29,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.ArrayList;
-
 /**
  * Created by durgesh on 5/10/16.
  */
 public class MapNavigationFragment extends Fragment {
     private GoogleMap mMap;
     private Stop[] stops;
-    private ArrayList<Marker> markers;
+    private Marker[] markers;
     private int srcPos, dstPos;
     private LatLng location;
+    private Marker currentMarker;
+    private Circle circle;
+    private float currentZoom = Constants.MAP_ZOOM;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,9 +58,10 @@ public class MapNavigationFragment extends Fragment {
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
-                markers = new ArrayList<>();
-                for (Stop stop : stops) {
-                    markers.add(mMap.addMarker(new MarkerOptions()
+                markers = new Marker[stops.length];
+                for (int i = 0 ; i < stops.length ; i++) {
+                    Stop stop = stops[i];
+                    markers[i] = (mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(stop.getStop_lat(), stop.getStop_lon()))
                             .icon(BitmapDescriptorFactory.defaultMarker())
                             .title(stop.getStop_name())));
@@ -105,7 +109,17 @@ public class MapNavigationFragment extends Fragment {
             @Override
             public void run() {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location,
-                        Constants.MAP_ZOOM));
+                        currentZoom));
+                if (currentMarker != null) {
+                    currentMarker.remove();
+                }
+                if (circle != null) {
+                    circle.remove();
+                }
+                currentMarker = mMap.addMarker(new MarkerOptions().title("your current location")
+                .position(location)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                circle = mMap.addCircle(new CircleOptions().center(location).radius(Constants.ERROR_RADIUS));
             }
         });
     }
