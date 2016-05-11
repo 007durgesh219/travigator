@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.frodo.travigator.R;
 import com.frodo.travigator.activities.NavigateActivity;
@@ -38,8 +37,7 @@ public class MapNavigationFragment extends Fragment {
     private Stop[] stops;
     private ArrayList<Marker> markers;
     private int srcPos, dstPos;
-    private boolean isFirstTimeAdjusted = false;
-    private int infoGivenPos = -1;
+    private LatLng location;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -102,7 +100,13 @@ public class MapNavigationFragment extends Fragment {
 
     @Subscribe
     public void onLocationChangedEvent(LocationChangedEvent event) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(event.getLocation(),
-                Constants.MAP_ZOOM));
+        this.location = event.getLocation();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location,
+                        Constants.MAP_ZOOM));
+            }
+        });
     }
 }

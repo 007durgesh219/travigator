@@ -32,8 +32,10 @@ import org.greenrobot.eventbus.Subscribe;
 public class TextNavigationFragment extends Fragment {
 
     private ListView stopsList ;
+    private StopListAdapter stopListAdapter;
     private Stop[] stops;
-    private int srcPos, dstPos;
+    private int[] status;
+    private int srcPos, dstPos, current = -1;
     private boolean isFirstTimeAdjusted = false;
     private int infoGivenPos = -1;
 
@@ -42,7 +44,24 @@ public class TextNavigationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.text_navigation_fragment, null);
         stopsList = (ListView)rootView.findViewById(R.id.stop_list);
-        stopsList.setAdapter(new StopListAdapter(getContext(), stops));
+        status = new int[stops.length];
+        if (srcPos <= dstPos) {
+            for (int i = 0 ; i < stops.length ; i++) {
+                if (i < srcPos || i > dstPos)
+                    status[i] = StopListAdapter.STATUS_INACTIVE;
+                else
+                    status[i] = StopListAdapter.STATUS_REMANING;
+            }
+        } else  {
+            for (int i = stops.length-1 ; i >= 0 ; i--) {
+                if (i > srcPos || i < dstPos)
+                    status[i] = StopListAdapter.STATUS_INACTIVE;
+                else
+                    status[i] = StopListAdapter.STATUS_REMANING;
+            }
+        }
+        stopListAdapter = new StopListAdapter(getContext(), stops, status);
+        stopsList.setAdapter(stopListAdapter);
         return rootView;
     }
 
@@ -99,6 +118,20 @@ public class TextNavigationFragment extends Fragment {
                 }
             }
             infoGivenPos = pos;
+            if (current != pos && current != -1) {
+                status[current] = StopListAdapter.STATUS_VISITED;
+            }
+            current = pos;
+            status[current] = StopListAdapter.STATUS_CURRENT;
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        stopListAdapter.changeStatus(status);
+                    }
+                });
+            }
+
         }
     }
 
