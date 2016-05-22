@@ -20,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,6 +42,7 @@ public class MapNavigationFragment extends Fragment {
     private Marker currentMarker;
     private Circle circle;
     private float currentZoom = Constants.MAP_ZOOM;
+    private boolean isFirstTimeZoomChange = true;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,6 +60,15 @@ public class MapNavigationFragment extends Fragment {
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 mMap.setMyLocationEnabled(true);
+                mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                    @Override
+                    public void onCameraChange(CameraPosition cameraPosition) {
+                        if (cameraPosition.zoom != currentZoom && !isFirstTimeZoomChange) {
+                            currentZoom = cameraPosition.zoom;
+                        }
+                        isFirstTimeZoomChange = false;
+                    }
+                });
                 markers = new Marker[stops.length];
                 for (int i = 0 ; i < stops.length ; i++) {
                     Stop stop = stops[i];
