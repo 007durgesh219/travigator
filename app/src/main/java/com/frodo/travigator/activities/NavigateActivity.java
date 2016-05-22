@@ -95,6 +95,24 @@ public class NavigateActivity extends FragmentActivity implements ActionBar.TabL
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (LocationUtil.checkLocationPermission() && LocationUtil.isGPSOn()) {
+            trApp.getLocationUtil().startLocationUpdates();
+        } else if (!LocationUtil.checkLocationPermission()){
+            trApp.getLocationUtil().askLocationPermission(this);
+        } else {
+            trApp.getLocationUtil().checkLocationSettings(this);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        trApp.getLocationUtil().stopLocationUpdates();
+        super.onBackPressed();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
@@ -111,6 +129,7 @@ public class NavigateActivity extends FragmentActivity implements ActionBar.TabL
         switch (requestCode) {
             case LocationUtil.REQUEST_CHECK_SETTINGS:
                 trApp.getLocationUtil().dialogClosed();
+                trApp.getLocationUtil().startLocationUpdates();
         }
     }
 

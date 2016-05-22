@@ -106,8 +106,22 @@ public class TextNavigationFragment extends Fragment {
             isFirstTimeAdjusted = true;
             stopsList.smoothScrollToPosition(CommonUtils.getNearstStop(stops, latLng));
         } else {
+            if (pos == -1) {
+                if(current != -1) {
+                    status[current] = StopListAdapter.STATUS_VISITED;
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopListAdapter.changeStatus(status);
+                            }
+                        });
+                    }
+                }
+                return;
+            }
             stopsList.smoothScrollToPosition(pos);
-            if (infoGivenPos != -1 && infoGivenPos != pos) {
+            if (infoGivenPos != pos) {
                 String message = "You arrived at " + stops[pos].getStop_name()+".";
                 if (dstPos == pos) {
                     message = message+". This is you final stop.";
@@ -117,8 +131,9 @@ public class TextNavigationFragment extends Fragment {
                 }
             }
             infoGivenPos = pos;
+            isFirstTimeAdjusted = false;
             if (current == -1)
-                return;
+                current = pos;
             if (current != pos) {
                 status[current] = StopListAdapter.STATUS_VISITED;
             }
